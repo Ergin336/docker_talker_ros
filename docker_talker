@@ -1,0 +1,35 @@
+docker pull ros:kinetic
+
+docker run -it --name=catkin_ws ros:kinetic bash
+
+apt-get update
+apt-get install -y build-essential
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+catkin_init_workspace
+git clone https://github.com/Ergin336/Proyectos_integrados_Ergin_talker.git
+cd ~/catkin_ws/
+catkin_make
+sed -i '/source "\/opt\/ros\/$ROS_DISTRO\/setup.bash"/a source "\/root\/catkin_ws\/devel\/setup.bash"' \ros_entrypoint.sh
+exit
+
+docker commit --author="Ergin Kamberov Pose"  --message="It works! catkin workspace configured with built ros_tutorials" catkin_ws ros:kinetic_talker
+docker images | grep ros
+docker inspect ros:kinetic_talker
+docker network create kinet
+docker network ls
+
+docker run -it --rm --net kinet --name master ros:kinetic_talker roscore
+
+docker run -it --rm --net kinet --name talker --env ROS_HOSTNAME=talker --env ROS_MASTER_URI=http://master:11311 ros:kinetic_talker rosrun talker_py publicador.py
+
+docker run -it --rm --net kinet --name listener --env ROS_HOSTNAME=talker --env ROS_MASTER_URI=http://master:11311 ros:kinetic_talker rosrun talker_py subscriptor.py
+
+docker service ls
+docker ps 
+docker exec -it master bash
+source /ros_entrypoint.sh
+rostopic list
+
+
+docker network rm kinet

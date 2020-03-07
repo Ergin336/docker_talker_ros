@@ -20,9 +20,7 @@ docker network create kinet
 docker network ls
 
 docker run -it --rm --net kinet --name master ros:kinetic_talker  roscore
-
 docker run -it --rm --net kinet --name talker --env ROS_HOSTNAME=talker --env ROS_MASTER_URI=http://master:11311 ros:kinetic_talker rosrun talker_py publicador.py
-
 docker run -it --rm --net kinet --name listener --env ROS_HOSTNAME=talker --env ROS_MASTER_URI=http://master:11311 ros:kinetic_talker  rosrun talker_py subscriptor.py
 
 docker service ls
@@ -32,7 +30,14 @@ source /ros_entrypoint.sh
 rostopic list
 
 
-docker network rm kinet
 docker tag ros:kinetic_talker ergin336/ros_talker:kinetic_talker
+docker login -u "user" -p "password" docker.io
 docker push ergin336/ros_talker:kinetic_talker
+docker pull ergin336/ros_talker:kinetic_talker
 
+docker network rm kinet
+
+
+https://hub.docker.com/r/ergin336/ros_talker
+
+replce ros:kinetic_talker for ergin336/ros_talker:kinetic_talker
